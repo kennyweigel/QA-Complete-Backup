@@ -9,12 +9,15 @@ import re
 
 class gui:
     def __init__(self,root):
-        self.fileName = ''
+        #create the string to link the browse with the text entry
+        self.fileName = Tkinter.StringVar()
+        self.fileName.set('')
         self.makeLabel(root)
         self.makeGoButton(root)
         self.makeBrowseButton(root)
-        self.makeMessage(root)
+        self.makeEntry(root)
         return
+
     def makeLabel(self,root):
         msg = 'Instructions:\n\n'+\
               '1. On the "Test Cases" tab of QA Complete select the Project you would\n'+\
@@ -31,23 +34,32 @@ class gui:
               'names created to 60 chars.  This means that the absolute path to\n'    +\
               'the directory that contains this script must be shorter than 60ish\n'  +\
               'chars.\n'
-        Tkinter.Label(root,text=msg,justify=Tkinter.LEFT).pack(side=Tkinter.TOP,padx=10,pady=10)
+        insTxt = Tkinter.Label(root,text=msg,justify=Tkinter.LEFT)
+        insTxt.pack(side=Tkinter.TOP,padx=5,pady=5)
         return
+
     def makeBrowseButton(self,root):
-        Tkinter.Button(root,text="Browse",command=self.fileOpen).pack(side=Tkinter.RIGHT,padx=10,pady=10)
+        browseBtn = Tkinter.Button(root,text="Browse",command=self.fileOpen)
+        browseBtn.pack(side=Tkinter.RIGHT,padx=5,pady=5)
         return
+
     def makeGoButton(self,root):
-        Tkinter.Button(root,text='Start', width=10).pack(side=Tkinter.RIGHT,padx=10,pady=10)
+        startBtn = Tkinter.Button(root,text='Start', width=10, command=self.backupScript)
+        startBtn.pack(side=Tkinter.RIGHT,padx=5,pady=5)
         return
-    def makeMessage(self,root):
-        Tkinter.Message(root,text='message',relief=Tkinter.SUNKEN, width=100).pack(side=Tkinter.RIGHT,padx=10,pady=10)
+
+    def makeEntry(self,root):
+        entryTxt = Tkinter.Entry(root,textvariable=self.fileName,relief=Tkinter.SUNKEN, width=50)
+        entryTxt.pack(side=Tkinter.RIGHT,padx=5,pady=5)
         return
+
     def printFileName(self):
         print self.fileName
 
     #opens the selected file name
     def fileOpen(self):
-        self.fileName = tkFileDialog.askopenfilename(filetypes=[("CSV Files","*.csv")])
+        browseFileName = tkFileDialog.askopenfilename(filetypes=[("CSV Files","*.csv")])
+        self.fileName.set(browseFileName)
         return
 
     #appends newText to file at location: path
@@ -58,7 +70,7 @@ class gui:
         return
 
     def backupScript(self):
-        exportCSV = open(self.fileName,'rb')  #opens CSV file
+        exportCSV = open(self.fileName.get(),'rb')    #opens CSV file
         dataCSV = csv.reader(exportCSV)         #parses CSV
         i = 0                                   #only execute first if statement once
         for r in dataCSV:
@@ -106,6 +118,9 @@ class gui:
 def main():
     root = Tkinter.Tk()
     k = gui(root)
+    #disallow window resizing
+    root.resizable(False, False)
+    #add a title to the window
     root.title('QAC Backup')
     root.mainloop()
 
